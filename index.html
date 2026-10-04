@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ENSTEIN BARCODES</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--bg:#f4f6f9;--side:#1c2536;--hover:#2e3c50;--accent:#2970ff;--text:#111928;--muted:#6b7280;--line:#e5e7eb;--danger:#ef4444}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text)}
+.hidden{display:none!important}
+.card{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.1);padding:24px;margin-bottom:24px}
+h1{margin:0 0 20px;font-size:1.8rem}
+h3{margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--line);font-size:1.1rem}
+.fg{margin-bottom:16px;flex:1;min-width:110px}
+.fg label{display:block;margin-bottom:6px;font-weight:500;font-size:.9rem;color:#374151}
+.fc{width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;font:inherit;font-size:.95rem}
+.fc:focus,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.row{display:flex;gap:16px;flex-wrap:wrap}
+.btn{display:inline-block;padding:10px 20px;border:none;border-radius:6px;font:inherit;font-weight:500;font-size:.95rem;cursor:pointer;text-decoration:none;text-align:center}
+.btn-p{background:var(--accent);color:#fff}.btn-p:hover{background:#1e5adb}.btn-p:disabled{opacity:.6;cursor:wait}
+.btn-o{background:transparent;border:1px solid var(--line);color:var(--text)}.btn-o:hover{background:#f9fafb}
+.btn-s{padding:4px 10px;font-size:.8rem}
+.btn-d{color:var(--danger);border-color:var(--danger)}
+.app{display:flex;min-height:100vh}
+.side{width:260px;flex:none;background:var(--side);color:#fff;display:flex;flex-direction:column}
+.side .brand{padding:24px;font-weight:700;font-size:1.2rem;letter-spacing:1px;border-bottom:1px solid rgba(255,255,255,.1)}
+.nav{padding:20px 0;flex-grow:1}
+.nav button{display:block;width:100%;text-align:left;background:none;border:0;border-left:4px solid transparent;padding:12px 20px;color:#d1d5db;font:inherit;font-weight:500;cursor:pointer}
+.nav button:hover,.nav button.on{background:var(--hover);color:#fff;border-left-color:var(--accent)}
+.side .who{padding:16px 24px;border-top:1px solid rgba(255,255,255,.1);font-size:.8rem;color:#9ca3af;word-break:break-all}
+.side .who button{margin-top:8px;width:100%;color:#fff;border-color:rgba(255,255,255,.3)}
+.main{flex-grow:1;padding:40px;min-width:0}
+.cols{display:flex;gap:24px;align-items:flex-start}.cols>.l{flex:2;min-width:0}.cols>.r{flex:1;min-width:0}
+#preview{min-height:200px;display:flex;align-items:center;justify-content:center;background:#f9fafb;border:1px dashed var(--line);border-radius:6px;margin-bottom:16px;overflow:hidden;color:var(--muted);text-align:center;padding:8px}
+#preview img{max-width:100%;height:auto;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+.acts{display:flex;flex-direction:column;gap:10px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-weight:600;color:var(--muted);font-size:.85rem}
+.cf{display:flex;gap:12px;margin-bottom:12px;align-items:center}
+.msg{font-size:.85rem;margin:6px 0 0;color:var(--muted)}.err{color:var(--danger)}
+.center{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.box{background:#fff;width:100%;max-width:420px;border-radius:10px;box-shadow:0 4px 6px rgba(0,0,0,.1);overflow:hidden}
+.box .hd{background:var(--side);color:#fff;padding:20px;text-align:center}
+.box .hd h2{margin:0;letter-spacing:1px;font-size:1.4rem}.box .hd p{margin:5px 0 0;color:#9ca3af;font-size:.85rem}
+.box .bd{padding:20px}
+.pr{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid #f3f4f6}
+.pr .k{font-weight:600;color:#4b5563;font-size:.9rem}.pr .v{font-weight:500;text-align:right;word-break:break-all}
+.box h3{margin-top:20px}.box h3:first-child{margin-top:0}
+.ft{text-align:center;padding:14px;font-size:.85rem;color:#9ca3af;background:#f9fafb;border-top:1px solid var(--line)}
+@media(max-width:860px){.app{flex-direction:column}.side{width:100%}.nav{padding:0;display:flex}.nav button{text-align:center;border-left:0;border-bottom:3px solid transparent}.nav button.on{border-bottom-color:var(--accent)}.main{padding:20px}.cols{flex-direction:column}.cols>.l,.cols>.r{width:100%}}
+@media print{body *{visibility:hidden}#preview img,#preview img *{visibility:visible}#preview{position:absolute;left:0;top:0;border:0;background:none}#preview img{box-shadow:none}}
+</style>
+</head>
+<body>
+
+<!-- Public part page (opened by scanning the QR code) -->
+<div id="v-public" class="center hidden"><div class="box">
+  <div class="hd"><h2>ENSTEIN BARCODES</h2><p>Industrial Part Information</p></div>
+  <div class="bd" id="public-body">Loading…</div>
+  <div class="ft">Verified by ENSTEIN Systems</div>
+</div></div>
+
+<!-- Login -->
+<div id="v-login" class="center hidden"><div class="box">
+  <div class="hd"><h2>ENSTEIN BARCODES</h2><p>Admin sign in</p></div>
+  <div class="bd">
+    <div class="fg"><label for="email">Email</label><input id="email" type="email" class="fc" autocomplete="username"></div>
+    <div class="fg"><label for="pass">Password</label><input id="pass" type="password" class="fc" autocomplete="current-password"></div>
+    <button id="login-btn" class="btn btn-p" style="width:100%">Sign in</button>
+    <p id="login-err" class="msg err"></p>
+  </div>
+</div></div>
+
+<!-- Admin dashboard -->
+<div id="v-admin" class="app hidden">
+  <aside class="side">
+    <div class="brand">ENSTEIN BARCODES</div>
+    <div class="nav">
+      <button data-tab="generate" class="on">Generate Barcode</button>
+      <button data-tab="records">Parts &amp; Records</button>
+    </div>
+    <div class="who"><span id="who"></span><button id="logout" class="btn btn-o btn-s">Sign out</button></div>
+  </aside>
+  <main class="main">
+    <section id="t-generate">
+      <h1>Generate New Barcode</h1>
+      <div class="cols">
+        <div class="l">
+          <div class="card"><h3>Part Information</h3>
+            <div class="row">
+              <div class="fg"><label for="vendor_name">Vendor Name</label><input id="vendor_name" class="fc" placeholder="e.g. ABC Industries"></div>
+              <div class="fg"><label for="vendor_id">Vendor ID</label><input id="vendor_id" class="fc" placeholder="e.g. V001"></div>
+            </div>
+            <div class="row">
+              <div class="fg"><label for="part_name">Part Name</label><input id="part_name" class="fc" placeholder="e.g. Robotic Joint"></div>
+              <div class="fg"><label for="joint_id">Joint ID</label><input id="joint_id" class="fc" placeholder="e.g. J03"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);margin-bottom:16px;padding-bottom:10px">
+              <h3 style="border:0;padding:0;margin:0">Additional Information</h3>
+              <button class="btn btn-o btn-s" id="add-cf">+ Add Custom Field</button>
+            </div>
+            <div id="cf-box"></div>
+          </div>
+          <div class="card"><h3>Label Settings</h3>
+            <div class="row">
+              <div class="fg"><label for="lw">Width (mm)</label><input id="lw" type="number" class="fc" value="100" min="30"></div>
+              <div class="fg"><label for="lh">Height (mm)</label><input id="lh" type="number" class="fc" value="50" min="20"></div>
+              <div class="fg"><label for="lm">Margin (mm)</label><input id="lm" type="number" class="fc" value="5" min="1"></div>
+              <div class="fg"><label for="lo">Orientation</label><select id="lo" class="fc"><option value="landscape">Landscape</option><option value="portrait">Portrait</option></select></div>
+            </div>
+            <div class="fg"><label for="base">Public base URL (the QR code opens this page)</label><input id="base" class="fc"><p class="msg" id="base-msg"></p></div>
+          </div>
+          <button id="gen-btn" class="btn btn-p" style="width:100%;padding:14px;font-size:1.1rem">Generate Barcode &amp; Label</button>
+          <p id="gen-err" class="msg err"></p>
+        </div>
+        <div class="r"><div class="card" style="position:sticky;top:20px"><h3>Label Preview</h3>
+          <div id="preview">Fill details to generate preview</div>
+          <div id="acts" class="acts hidden">
+            <button class="btn btn-o" id="a-png">Save PNG</button>
+            <button class="btn btn-o" id="a-pdf">Save PDF</button>
+            <button class="btn btn-o" id="a-print">Print</button>
+            <button class="btn btn-p" id="a-new">Generate New Part</button>
+          </div>
+        </div></div>
+      </div>
+    </section>
+
+    <section id="t-records" class="hidden">
+      <h1>Parts &amp; Records</h1>
+      <div class="card">
+        <input id="search" class="fc" placeholder="Search by Part ID, vendor or part name…" style="margin-bottom:16px;max-width:420px">
+        <p id="rec-err" class="msg err"></p>
+        <div style="overflow-x:auto"><table>
+          <thead><tr><th>Part ID</th><th>Vendor</th><th>Vendor ID</th><th>Part Name</th><th>Joint ID</th><th>Serial</th><th>Registered</th><th>Actions</th></tr></thead>
+          <tbody id="rec-body"></tbody>
+        </table></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getDatabase, ref, get, set, remove, onValue, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAzS7XXJQ2A-ljef0S4xZ9DHAOT830WM9I",
+  authDomain: "barcode-71d84.firebaseapp.com",
+  databaseURL: "https://barcode-71d84-default-rtdb.firebaseio.com",
+  projectId: "barcode-71d84",
+  storageBucket: "barcode-71d84.firebasestorage.app",
+  messagingSenderId: "300600805315",
+  appId: "1:300600805315:web:e0472d80e48f94ab0b1f76",
+  measurementId: "G-N8SBM93YRY"
+};
+const app = initializeApp(firebaseConfig);
+isSupported().then(ok => { if (ok) getAnalytics(app); }).catch(() => {});
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const clean = s => s.trim().replace(/[.$#\[\]\/\s]+/g, "_");           // safe for DB keys + barcode IDs
+const show = id => ["v-public","v-login","v-admin"].forEach(v => $(v).classList.toggle("hidden", v !== id));
+
+/* ---------- Public part page: ?part=<BarcodeID> ---------- */
+const partId = new URLSearchParams(location.search).get("part");
+if (partId) {
+  show("v-public");
+  get(ref(db, "public/" + clean(partId))).then(snap => {
+    const p = snap.val();
+    if (!p) { $("public-body").textContent = "Part not found."; return; }
+    const r = (k, v) => `<div class="pr"><span class="k">${esc(k)}</span><span class="v">${esc(v)}</span></div>`;
+    let h = "<h3>Standard Information</h3>" + r("Part ID", p.barcodeId) + r("Vendor", `${p.vendorName} (${p.vendorId})`) +
+            r("Part Name", p.partName) + r("Joint ID", p.jointId) + r("Registration Date", p.registered);
+    if (p.fields && p.fields.length) h += "<h3>Additional Information</h3>" + p.fields.map(f => r(f.name, f.value)).join("");
+    $("public-body").innerHTML = h;
+  }).catch(() => { $("public-body").textContent = "Could not load part details."; });
+} else {
+  /* ---------- Admin (login required) ---------- */
+  let unsub = null, records = [], lastRec = null;
+  show("v-login");
+
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      show("v-admin"); $("who").textContent = user.email;
+      unsub = onValue(ref(db, "parts"), snap => {
+        $("rec-err").textContent = "";
+        records = Object.values(snap.val() || {}).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        renderRecords();
+      }, e => { $("rec-err").textContent = "Cannot read records: " + e.message; });
+    } else {
+      if (unsub) { unsub(); unsub = null; }
+      records = []; show("v-login");
+    }
+  });
+
+  const login = async () => {
+    $("login-err").textContent = "";
+    try { await signInWithEmailAndPassword(auth, $("email").value.trim(), $("pass").value); $("pass").value = ""; }
+    catch (e) { $("login-err").textContent = ["auth/invalid-credential","auth/wrong-password","auth/user-not-found","auth/invalid-email"].includes(e.code) ? "Wrong email or password." : "Sign-in failed: " + e.code; }
+  };
+  $("login-btn").onclick = login;
+  $("pass").onkeydown = e => { if (e.key === "Enter") login(); };
+  $("logout").onclick = () => signOut(auth);
+
+  document.querySelectorAll(".nav button").forEach(b => b.onclick = () => {
+    document.querySelectorAll(".nav button").forEach(x => x.classList.toggle("on", x === b));
+    $("t-generate").classList.toggle("hidden", b.dataset.tab !== "generate");
+    $("t-records").classList.toggle("hidden", b.dataset.tab !== "records");
+  });
+
+  /* ---------- Label drawing (canvas, ~300 DPI) ---------- */
+  const fit = (x, t, max) => { if (x.measureText(t).width <= max) return t; while (t.length > 1 && x.measureText(t + "…").width > max) t = t.slice(0, -1); return t + "…"; };
+
+  function drawQR(x, url, px, py, size) {
+    const q = qrcode(0, "M"); q.addData(url); q.make();
+    const n = q.getModuleCount(), cell = size / (n + 2);
+    x.fillStyle = "#000";
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++)
+      if (q.isDark(r, c)) x.fillRect(px + (c + 1) * cell, py + (r + 1) * cell, Math.ceil(cell), Math.ceil(cell));
+  }
+
+  function drawLabel(rec) {
+    const c = rec.label || {}; let w = +c.width || 100, h = +c.height || 50; const m = +c.margin || 5;
+    const port = c.orientation === "portrait"; if (port) [w, h] = [h, w];
+    const S = 11.8, W = Math.round(w * S), H = Math.round(h * S), M = Math.round(m * S);
+    const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+    const x = cv.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, W, H); x.fillStyle = "#000"; x.textBaseline = "top";
+
+    const bh = Math.round(H * 0.2), tH = Math.max(12, Math.round(H * 0.06)), gap = Math.round(M * 0.6);
+    const bcY = H - M - tH - bh - 4, avail = bcY - gap - M;
+    const qr = Math.max(20, Math.floor(port ? Math.min(W - 2 * M, avail * 0.5) : Math.min(W * 0.34, avail)));
+    const qx = port ? Math.round((W - qr) / 2) : W - M - qr;
+    drawQR(x, rec.url, qx, M, qr);
+
+    const tw = port ? W - 2 * M : qx - M - gap; let ty = port ? M + qr + gap : M;
+    const fs = Math.max(10, Math.round(Math.min(H, W) * 0.075));
+    [["ENSTEIN BARCODES", 1.15, 1], ["Vendor: " + rec.vendorName, 1], ["Part: " + rec.partName, 1], ["Joint: " + rec.jointId, 1], ["Part ID: " + rec.barcodeId, 1]]
+      .forEach(([t, k, b], i) => {
+        const size = Math.round(fs * (i === 0 ? 1.15 : 1));
+        x.font = `${i < 1 ? "bold " : ""}${size}px Arial, sans-serif`;
+        x.fillText(fit(x, t, tw), M, ty); ty += Math.round(size * 1.35);
+      });
+
+    const tmp = document.createElement("canvas");
+    JsBarcode(tmp, rec.barcodeId, { format: "CODE128", displayValue: false, margin: 0, width: 2, height: 60 });
+    x.imageSmoothingEnabled = false; x.drawImage(tmp, M, bcY, W - 2 * M, bh);
+    x.font = `${tH}px Arial, sans-serif`; x.textAlign = "center"; x.fillText(rec.barcodeId, W / 2, bcY + bh + 4);
+    return { cv, w, h };
+  }
+
+  const save = (blobUrl, name) => { const a = document.createElement("a"); a.href = blobUrl; a.download = name; a.click(); };
+  const savePNG = rec => drawLabel(rec).cv.toBlob(b => { const u = URL.createObjectURL(b); save(u, rec.barcodeId + "_label.png"); setTimeout(() => URL.revokeObjectURL(u), 5000); });
+  const savePDF = rec => {
+    const { cv, w, h } = drawLabel(rec), { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: w >= h ? "l" : "p", unit: "mm", format: [w, h] });
+    pdf.addImage(cv.toDataURL("image/png"), "PNG", 0, 0, w, h); pdf.save(rec.barcodeId + "_label.pdf");
+  };
+
+  /* ---------- Generate form ---------- */
+  const defBase = location.href.split("?")[0].split("#")[0].replace(/index\.html$/, "");
+  $("base").value = defBase;
+  const baseHint = () => {
+    const bad = /^file:|localhost|127\.0\.0\.1|192\.168\./.test($("base").value);
+    $("base-msg").textContent = bad ? "Warning: this address only works on this computer/network. Use your Firebase Hosting URL for real labels." : "";
+  };
+  $("base").oninput = baseHint; baseHint();
+
+  let cfN = 0;
+  $("add-cf").onclick = () => {
+    const id = "cf" + cfN++;
+    $("cf-box").insertAdjacentHTML("beforeend", `<div class="cf" id="${id}">
+      <input class="fc cf-n" placeholder="Field name (e.g. Material)"><input class="fc cf-v" placeholder="Value (e.g. Aluminium)">
+      <label style="white-space:nowrap;font-size:.85rem"><input type="checkbox" class="cf-p" checked> Public</label>
+      <button class="btn btn-o btn-d btn-s" onclick="this.parentNode.remove()">X</button></div>`);
+  };
+  const customFields = () => [...document.querySelectorAll("#cf-box .cf")]
+    .map(d => ({ name: d.querySelector(".cf-n").value.trim(), value: d.querySelector(".cf-v").value.trim(), public: d.querySelector(".cf-p").checked }))
+    .filter(f => f.name);
+
+  $("gen-btn").onclick = async () => {
+    const err = $("gen-err"); err.textContent = "";
+    const vendorName = $("vendor_name").value.trim(), vendorId = clean($("vendor_id").value),
+          partName = $("part_name").value.trim(), jointId = clean($("joint_id").value);
+    if (!vendorName || !vendorId || !partName || !jointId) { err.textContent = "Please fill all Part Information fields."; return; }
+    const btn = $("gen-btn"); btn.disabled = true;
+    try {
+      const tx = await runTransaction(ref(db, "meta/serial"), cur => (cur || 0) + 1);   // atomic, no duplicate serials
+      const serial = String(tx.snapshot.val()).padStart(4, "0");
+      const barcodeId = `${vendorId}-${jointId}-${serial}`;
+      const base = $("base").value.trim().replace(/\/?$/, "/");
+      const fields = customFields();
+      const rec = {
+        barcodeId, vendorName, vendorId, partName, jointId, serial, fields,
+        url: `${base}?part=${encodeURIComponent(barcodeId)}`,
+        label: { width: $("lw").value, height: $("lh").value, margin: $("lm").value, orientation: $("lo").value },
+        createdAt: serverTimestamp()
+      };
+      await set(ref(db, "parts/" + barcodeId), rec);
+      await set(ref(db, "public/" + barcodeId), {          // only what a scanner is allowed to see
+        barcodeId, vendorName, vendorId, partName, jointId,
+        registered: new Date().toLocaleString(),
+        fields: fields.filter(f => f.public).map(({ name, value }) => ({ name, value }))
+      });
+      lastRec = rec;
+      $("preview").innerHTML = `<div><img alt="Label preview" src="${drawLabel(rec).cv.toDataURL("image/png")}">
+        <p class="msg" style="word-break:break-all">QR opens: <a href="${esc(rec.url)}" target="_blank" rel="noopener">${esc(rec.url)}</a></p></div>`;
+      $("acts").classList.remove("hidden");
+    } catch (e) { err.textContent = "Could not save: " + e.message; }
+    btn.disabled = false;
+  };
+  $("a-png").onclick = () => lastRec && savePNG(lastRec);
+  $("a-pdf").onclick = () => lastRec && savePDF(lastRec);
+  $("a-print").onclick = () => window.print();
+  $("a-new").onclick = () => {
+    ["vendor_name", "vendor_id", "part_name", "joint_id"].forEach(i => $(i).value = "");
+    $("cf-box").innerHTML = ""; cfN = 0; lastRec = null;
+    $("preview").textContent = "Fill details to generate preview"; $("acts").classList.add("hidden");
+  };
+
+  /* ---------- Records (live) ---------- */
+  function renderRecords() {
+    const q = $("search").value.trim().toLowerCase();
+    const rows = records.filter(r => !q || [r.barcodeId, r.vendorName, r.partName].some(v => String(v).toLowerCase().includes(q)));
+    $("rec-body").innerHTML = rows.length ? rows.map(r => `<tr>
+      <td><strong>${esc(r.barcodeId)}</strong></td><td>${esc(r.vendorName)}</td><td>${esc(r.vendorId)}</td><td>${esc(r.partName)}</td>
+      <td>${esc(r.jointId)}</td><td>${esc(r.serial)}</td><td>${r.createdAt ? new Date(r.createdAt).toLocaleString() : ""}</td>
+      <td><button class="btn btn-o btn-s" data-a="png" data-id="${esc(r.barcodeId)}">PNG</button>
+          <button class="btn btn-o btn-s" data-a="pdf" data-id="${esc(r.barcodeId)}">PDF</button>
+          <a class="btn btn-o btn-s" href="${esc(r.url)}" target="_blank" rel="noopener">Open</a>
+          <button class="btn btn-o btn-s btn-d" data-a="del" data-id="${esc(r.barcodeId)}">Delete</button></td></tr>`).join("")
+      : `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px">No parts found.</td></tr>`;
+  }
+  $("search").oninput = renderRecords;
+  $("rec-body").onclick = async e => {
+    const b = e.target.closest("button[data-a]"); if (!b) return;
+    const rec = records.find(r => r.barcodeId === b.dataset.id); if (!rec) return;
+    if (b.dataset.a === "png") savePNG(rec);
+    else if (b.dataset.a === "pdf") savePDF(rec);
+    else if (confirm(`Delete ${rec.barcodeId}? Its QR code will stop working.`)) {
+      try { await remove(ref(db, "parts/" + rec.barcodeId)); await remove(ref(db, "public/" + rec.barcodeId)); }
+      catch (er) { $("rec-err").textContent = "Delete failed: " + er.message; }
+    }
+  };
+}
+</script>
+</body>
+</html>
