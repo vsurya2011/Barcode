@@ -93,13 +93,66 @@ th{font-weight:600;color:var(--muted);font-size:.85rem}
         <div class="l">
           <div class="card"><h3>Part Information</h3>
             <div class="row">
-              <div class="fg"><label for="vendor_name">Vendor Name</label><input id="vendor_name" class="fc" placeholder="e.g. ABC Industries"></div>
-              <div class="fg"><label for="vendor_id">Vendor ID</label><input id="vendor_id" class="fc" placeholder="e.g. V001"></div>
-            </div>
+              <div class="fg">
+  <label for="vendor_name">Vendor Name</label>
+  <select id="vendor_name" class="fc">
+    <option value="">Select Vendor</option>
+    <option value="ABC Industries">ABC Industries</option>
+    <option value="XYZ Industries">XYZ Industries</option>
+    <option value="Demo Vendor">Demo Vendor</option>
+  </select>
+</div>
             <div class="row">
-              <div class="fg"><label for="part_name">Part Name</label><input id="part_name" class="fc" placeholder="e.g. Robotic Joint"></div>
-              <div class="fg"><label for="joint_id">Joint ID</label><input id="joint_id" class="fc" placeholder="e.g. J03"></div>
-            </div>
+            <div class="fg">
+  <label for="part_name">Part Name</label>
+  <select id="part_name" class="fc">
+    <option value="">Select Part</option>
+    <option value="Robotic Joint">Robotic Joint</option>
+    <option value="Shaft">Shaft</option>
+    <option value="Gear">Gear</option>
+    <option value="Housing">Housing</option>
+  </select>
+</div>
+              
+  <div class="fg">
+    <label for="serial_no">Serial No</label>
+    <select id="serial_no" class="fc">
+      <option value="">Select Serial No</option>
+      <option value="0001">0001</option>
+      <option value="0002">0002</option>
+      <option value="0003">0003</option>
+      <option value="0004">0004</option>
+      <option value="0005">0005</option>
+    </select>
+  </div>
+</div>
+<div class="row">
+  <div class="fg">
+    <label for="joint_details">Joint Details</label>
+    <select id="joint_details" class="fc">
+      <option value="">Select Joint</option>
+      <option value="J01">J01</option>
+      <option value="J02">J02</option>
+      <option value="J03">J03</option>
+      <option value="J04">J04</option>
+      <option value="J05">J05</option>
+    </select>
+  </div>
+</div>
+<div class="row">
+  <div class="fg">
+    <label for="quantity">Quantity</label>
+    <select id="quantity" class="fc">
+      <option value="">Select Quantity</option>
+      <option value="1">1</option>
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+    </select>
+  </div>
+</div>
           </div>
           <div class="card">
             <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);margin-bottom:16px;padding-bottom:10px">
@@ -176,7 +229,7 @@ const show = id => ["v-public","v-login","v-admin"].forEach(v => $(v).classList.
 const partId = new URLSearchParams(location.search).get("part");
 if (partId) {
   show("v-public");
-  get(ref(db, "public/" + clean(partId))).then(snap => {
+  get(ref(db, "public/" + partId)).then(snap => {
     const p = snap.val();
     if (!p) { $("public-body").textContent = "Part not found."; return; }
     const r = (k, v) => `<div class="pr"><span class="k">${esc(k)}</span><span class="v">${esc(v)}</span></div>`;
@@ -290,28 +343,54 @@ if (partId) {
 
   $("gen-btn").onclick = async () => {
     const err = $("gen-err"); err.textContent = "";
-    const vendorName = $("vendor_name").value.trim(), vendorId = clean($("vendor_id").value),
-          partName = $("part_name").value.trim(), jointId = clean($("joint_id").value);
-    if (!vendorName || !vendorId || !partName || !jointId) { err.textContent = "Please fill all Part Information fields."; return; }
+    const vendorName = $("vendor_name").value;
+    const partName = $("part_name").value;
+    const serialNo = $("serial_no").value;
+    const jointDetails = $("joint_details").value;
+    const quantity = $("quantity").value;
+
+if (!vendorName || !partName || !serialNo || !jointDetails || !quantity) {
+  err.textContent = "Please select all Part Information fields.";
+  return;
+}
     const btn = $("gen-btn"); btn.disabled = true;
     try {
       const tx = await runTransaction(ref(db, "meta/serial"), cur => (cur || 0) + 1);   // atomic, no duplicate serials
       const serial = String(tx.snapshot.val()).padStart(4, "0");
-      const barcodeId = `${vendorId}-${jointId}-${serial}`;
+      const barcodeId = `${vendorName}-${jointDetails}-${serialNo}`;
       const base = $("base").value.trim().replace(/\/?$/, "/");
       const fields = customFields();
-      const rec = {
-        barcodeId, vendorName, vendorId, partName, jointId, serial, fields,
-        url: `${base}?part=${encodeURIComponent(barcodeId)}`,
-        label: { width: $("lw").value, height: $("lh").value, margin: $("lm").value, orientation: $("lo").value },
-        createdAt: serverTimestamp()
-      };
+     const rec = {
+  barcodeId,
+  vendorName,
+  vendorId: clean(vendorName),
+  partName,
+  jointId: jointDetails,
+  serial: serialNo,
+  quantity,
+  fields,
+  url: `${base}?part=${encodeURIComponent(barcodeId)}`,
+  label: {
+    width: $("lw").value,
+    height: $("lh").value,
+    margin: $("lm").value,
+    orientation: $("lo").value
+  },
+  createdAt: serverTimestamp()
+};
       await set(ref(db, "parts/" + barcodeId), rec);
-      await set(ref(db, "public/" + barcodeId), {          // only what a scanner is allowed to see
-        barcodeId, vendorName, vendorId, partName, jointId,
-        registered: new Date().toLocaleString(),
-        fields: fields.filter(f => f.public).map(({ name, value }) => ({ name, value }))
-      });
+      await set(ref(db, "public/" + barcodeId), {
+  barcodeId,
+  vendorName,
+  partName,
+  jointId: jointDetails,
+  serial: serialNo,
+  quantity,
+  registered: new Date().toLocaleString(),
+fields: fields
+  .filter(f => f.public)
+  .map(({ name, value }) => ({ name, value }))
+});
       lastRec = rec;
       $("preview").innerHTML = `<div><img alt="Label preview" src="${drawLabel(rec).cv.toDataURL("image/png")}">
         <p class="msg" style="word-break:break-all">QR opens: <a href="${esc(rec.url)}" target="_blank" rel="noopener">${esc(rec.url)}</a></p></div>`;
@@ -323,7 +402,7 @@ if (partId) {
   $("a-pdf").onclick = () => lastRec && savePDF(lastRec);
   $("a-print").onclick = () => window.print();
   $("a-new").onclick = () => {
-    ["vendor_name", "vendor_id", "part_name", "joint_id"].forEach(i => $(i).value = "");
+    ["vendor_name", "part_name", "joint details","serialNo","quantity"].forEach(i => $(i).value = "");
     $("cf-box").innerHTML = ""; cfN = 0; lastRec = null;
     $("preview").textContent = "Fill details to generate preview"; $("acts").classList.add("hidden");
   };
