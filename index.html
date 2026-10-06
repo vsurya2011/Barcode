@@ -53,6 +53,57 @@ th{font-weight:600;color:var(--muted);font-size:.85rem}
 .box h3{margin-top:20px}.box h3:first-child{margin-top:0}
 .ft{text-align:center;padding:14px;font-size:.85rem;color:#9ca3af;background:#f9fafb;border-top:1px solid var(--line)}
 @media(max-width:860px){.app{flex-direction:column}.side{width:100%}.nav{padding:0;display:flex}.nav button{text-align:center;border-left:0;border-bottom:3px solid transparent}.nav button.on{border-bottom-color:var(--accent)}.main{padding:20px}.cols{flex-direction:column}.cols>.l,.cols>.r{width:100%}}
+
+/* ===== searchable dropdown ===== */
+.part-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.part-grid .fg{margin-bottom:0;min-width:0}
+.ss{position:relative}
+.ss-btn{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#fff;text-align:left;cursor:pointer;color:var(--text)}
+.ss-btn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ss-btn.ph span{color:var(--muted)}
+.ss-btn::after{content:"";flex:none;width:7px;height:7px;border:solid var(--muted);border-width:0 2px 2px 0;transform:rotate(45deg);margin-top:-3px}
+.ss-panel{position:absolute;z-index:30;left:0;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.15);padding:8px}
+.ss-list{list-style:none;margin:8px 0 0;padding:0;max-height:220px;overflow-y:auto;overscroll-behavior:contain}
+.ss-list li{padding:10px;border-radius:6px;cursor:pointer;font-size:.95rem}
+.ss-list li.act,.ss-list li:hover{background:#eef3ff}
+.ss-list li.sel{font-weight:600;color:var(--accent)}
+.ss-list li.none{color:var(--muted);cursor:default;background:none}
+
+/* ===== all-device responsive ===== */
+#preview img{max-width:100%;max-height:75vh;width:auto;height:auto;object-fit:contain}
+@supports(height:100dvh){.center,.app{min-height:100dvh}}
+@media(max-width:1100px){.main{padding:28px}}
+@media(max-width:860px){
+  .side .brand{padding:14px 20px}
+  .nav button{flex:1;padding:12px 8px}
+  .side .who{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 20px}
+  .side .who button{width:auto;margin:0}
+  .cols>.r .card{position:static!important}
+}
+@media(max-width:700px){
+  table,thead,tbody,tr,td{display:block}
+  thead{display:none}
+  tr{border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin-bottom:12px}
+  td{display:flex;justify-content:space-between;gap:12px;border:0;padding:6px 0;white-space:normal;text-align:right;word-break:break-all}
+  td[data-label]::before{content:attr(data-label);font-weight:600;color:var(--muted);text-align:left;flex:none}
+  td.act{flex-wrap:wrap;justify-content:flex-start}
+  td.act::before{display:none}
+}
+@media(max-width:600px){
+  h1{font-size:1.4rem;margin-bottom:14px}
+  .main{padding:14px}
+  .card{padding:16px;margin-bottom:16px}
+  .fc,.ss-q{font-size:16px}
+  .row{gap:12px}
+  .row .fg{min-width:calc(50% - 6px)}
+  .part-grid{grid-template-columns:1fr}
+  .cf{flex-wrap:wrap}.cf .fc{flex:1 1 140px}
+  .center{padding:12px}
+}
+@media(max-height:500px) and (orientation:landscape){
+  .center{align-items:flex-start}
+  #preview img{max-height:80vh}
+}
 @media print{body *{visibility:hidden}#preview img,#preview img *{visibility:visible}#preview{position:absolute;left:0;top:0;border:0;background:none}#preview img{box-shadow:none}}
 </style>
 </head>
@@ -92,67 +143,51 @@ th{font-weight:600;color:var(--muted);font-size:.85rem}
       <div class="cols">
         <div class="l">
           <div class="card"><h3>Part Information</h3>
-            <div class="row">
-              <div class="fg">
-  <label for="vendor_name">Vendor Name</label>
-  <select id="vendor_name" class="fc">
-    <option value="">Select Vendor</option>
-    <option value="ABC Industries">ABC Industries</option>
-    <option value="XYZ Industries">XYZ Industries</option>
-    <option value="Demo Vendor">Demo Vendor</option>
-  </select>
-</div>
-            <div class="row">
-            <div class="fg">
-  <label for="part_name">Part Name</label>
-  <select id="part_name" class="fc">
-    <option value="">Select Part</option>
-    <option value="Robotic Joint">Robotic Joint</option>
-    <option value="Shaft">Shaft</option>
-    <option value="Gear">Gear</option>
-    <option value="Housing">Housing</option>
-  </select>
-</div>
-              
-  <div class="fg">
-    <label for="serial_no">Serial No</label>
-    <select id="serial_no" class="fc">
-      <option value="">Select Serial No</option>
-      <option value="0001">0001</option>
-      <option value="0002">0002</option>
-      <option value="0003">0003</option>
-      <option value="0004">0004</option>
-      <option value="0005">0005</option>
-    </select>
-  </div>
-</div>
-<div class="row">
-  <div class="fg">
-    <label for="joint_details">Joint Details</label>
-    <select id="joint_details" class="fc">
-      <option value="">Select Joint</option>
-      <option value="J01">J01</option>
-      <option value="J02">J02</option>
-      <option value="J03">J03</option>
-      <option value="J04">J04</option>
-      <option value="J05">J05</option>
-    </select>
-  </div>
-</div>
-<div class="row">
-  <div class="fg">
-    <label for="quantity">Quantity</label>
-    <select id="quantity" class="fc">
-      <option value="">Select Quantity</option>
-      <option value="1">1</option>
-      <option value="5">5</option>
-      <option value="10">10</option>
-      <option value="25">25</option>
-      <option value="50">50</option>
-      <option value="100">100</option>
-    </select>
-  </div>
-</div>
+    <div class="part-grid">
+      <div class="fg"><label for="vendor_name">Vendor Name</label>
+        <select id="vendor_name" class="fc">
+          <option value="">Select Vendor</option>
+          <option value="ABC Industries">ABC Industries</option>
+          <option value="XYZ Industries">XYZ Industries</option>
+          <option value="Demo Vendor">Demo Vendor</option>
+        </select></div>
+      <div class="fg"><label for="part_name">Part Name</label>
+        <select id="part_name" class="fc">
+          <option value="">Select Part</option>
+          <option value="Robotic Joint">Robotic Joint</option>
+          <option value="Shaft">Shaft</option>
+          <option value="Gear">Gear</option>
+          <option value="Housing">Housing</option>
+        </select></div>
+      <div class="fg"><label for="serial_no">Serial No</label>
+        <select id="serial_no" class="fc">
+          <option value="">Select Serial No</option>
+          <option value="0001">0001</option>
+          <option value="0002">0002</option>
+          <option value="0003">0003</option>
+          <option value="0004">0004</option>
+          <option value="0005">0005</option>
+        </select></div>
+      <div class="fg"><label for="joint_details">Joint Details</label>
+        <select id="joint_details" class="fc">
+          <option value="">Select Joint</option>
+          <option value="J01">J01</option>
+          <option value="J02">J02</option>
+          <option value="J03">J03</option>
+          <option value="J04">J04</option>
+          <option value="J05">J05</option>
+        </select></div>
+      <div class="fg"><label for="quantity">Quantity</label>
+        <select id="quantity" class="fc">
+          <option value="">Select Quantity</option>
+          <option value="1">1</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select></div>
+    </div>
           </div>
           <div class="card">
             <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);margin-bottom:16px;padding-bottom:10px">
@@ -287,28 +322,51 @@ if (partId) {
     const c = rec.label || {}; let w = +c.width || 100, h = +c.height || 50; const m = +c.margin || 5;
     const port = c.orientation === "portrait"; if (port) [w, h] = [h, w];
     const S = 11.8, W = Math.round(w * S), H = Math.round(h * S), M = Math.round(m * S);
+    const FONT = "Arial, sans-serif";
     const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
-    const x = cv.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, W, H); x.fillStyle = "#000"; x.textBaseline = "top";
+    const x = cv.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, W, H); x.fillStyle = "#000"; x.textBaseline = "top"; x.textAlign = "left";
 
-    const bh = Math.round(H * 0.2), tH = Math.max(12, Math.round(H * 0.06)), gap = Math.round(M * 0.6);
+    // Part ID printed under the barcode: shrink the font until the whole ID fits the label width
+    let tH = Math.max(10, Math.round(H * 0.06)); const maxTW = W - 2 * M;
+    x.font = `${tH}px ${FONT}`;
+    while (tH > 8 && x.measureText(rec.barcodeId).width > maxTW) { tH--; x.font = `${tH}px ${FONT}`; }
+
+    const bh = Math.round(H * 0.2), gap = Math.round(M * 0.6);
     const bcY = H - M - tH - bh - 4, avail = bcY - gap - M;
     const qr = Math.max(20, Math.floor(port ? Math.min(W - 2 * M, avail * 0.5) : Math.min(W * 0.34, avail)));
     const qx = port ? Math.round((W - qr) / 2) : W - M - qr;
     drawQR(x, rec.url, qx, M, qr);
 
-    const tw = port ? W - 2 * M : qx - M - gap; let ty = port ? M + qr + gap : M;
-    const fs = Math.max(10, Math.round(Math.min(H, W) * 0.075));
-    [["ENSTEIN BARCODES", 1.15, 1], ["Vendor: " + rec.vendorName, 1], ["Part: " + rec.partName, 1], ["Joint: " + rec.jointId, 1], ["Part ID: " + rec.barcodeId, 1]]
-      .forEach(([t, k, b], i) => {
-        const size = Math.round(fs * (i === 0 ? 1.15 : 1));
-        x.font = `${i < 1 ? "bold " : ""}${size}px Arial, sans-serif`;
-        x.fillText(fit(x, t, tw), M, ty); ty += Math.round(size * 1.35);
+    // Info text: wrap long lines, then shrink until everything fits above the barcode
+    const tw = port ? W - 2 * M : qx - M - gap, ty0 = port ? M + qr + gap : M, availH = bcY - gap - ty0;
+    const specs = [["ENSTEIN BARCODES", 1.15, true], ["Vendor: " + rec.vendorName, 1, false], ["Part: " + rec.partName, 1, false],
+                   ["Joint: " + rec.jointId, 1, false], ["Part ID: " + rec.barcodeId, 1, false]];
+    const wrap = (t, max) => {
+      const out = []; let cur = "";
+      for (const wd of t.split(" ")) {
+        const test = cur ? cur + " " + wd : wd;
+        if (x.measureText(test).width <= max) cur = test; else { if (cur) out.push(cur); cur = wd; }
+      }
+      if (cur) out.push(cur);
+      return out.map(l => fit(x, l, max));
+    };
+    const build = f => {
+      const lines = []; let hgt = 0;
+      specs.forEach(([t, k, b]) => {
+        const size = Math.round(f * k); x.font = `${b ? "bold " : ""}${size}px ${FONT}`;
+        wrap(t, tw).forEach(l => { lines.push({ l, size, b }); hgt += Math.round(size * 1.3); });
       });
+      return { lines, hgt };
+    };
+    let fs = Math.max(10, Math.round(Math.min(H, W) * 0.075)), L = build(fs);
+    while (fs > 9 && L.hgt > availH) { fs--; L = build(fs); }
+    let ty = ty0;
+    L.lines.forEach(({ l, size, b }) => { x.font = `${b ? "bold " : ""}${size}px ${FONT}`; x.fillText(l, M, ty); ty += Math.round(size * 1.3); });
 
     const tmp = document.createElement("canvas");
     JsBarcode(tmp, rec.barcodeId, { format: "CODE128", displayValue: false, margin: 0, width: 2, height: 60 });
     x.imageSmoothingEnabled = false; x.drawImage(tmp, M, bcY, W - 2 * M, bh);
-    x.font = `${tH}px Arial, sans-serif`; x.textAlign = "center"; x.fillText(rec.barcodeId, W / 2, bcY + bh + 4);
+    x.font = `${tH}px ${FONT}`; x.textAlign = "center"; x.fillText(rec.barcodeId, W / 2, bcY + bh + 4);
     return { cv, w, h };
   }
 
@@ -319,6 +377,50 @@ if (partId) {
     const pdf = new jsPDF({ orientation: w >= h ? "l" : "p", unit: "mm", format: [w, h] });
     pdf.addImage(cv.toDataURL("image/png"), "PNG", 0, 0, w, h); pdf.save(rec.barcodeId + "_label.pdf");
   };
+
+  /* ---------- Searchable dropdowns ---------- */
+  function makeSearchable(sel) {
+    sel.classList.add("hidden");                       // real <select> stays in the DOM, so .value keeps working
+    const wrap = document.createElement("div"); wrap.className = "ss";
+    wrap.innerHTML = `<button type="button" class="fc ss-btn" aria-haspopup="listbox" aria-expanded="false"><span></span></button>
+      <div class="ss-panel hidden"><input type="search" class="fc ss-q" placeholder="Search…" autocomplete="off" aria-label="Search options"><ul class="ss-list" role="listbox"></ul></div>`;
+    sel.after(wrap);
+    const btn = wrap.querySelector(".ss-btn"), label = btn.firstElementChild, panel = wrap.querySelector(".ss-panel"),
+          q = wrap.querySelector(".ss-q"), list = wrap.querySelector(".ss-list");
+    const opts = [...sel.options].filter(o => o.value), placeholder = sel.options[0].textContent;
+    let shown = [], act = 0;
+    const sync = () => { const o = sel.selectedOptions[0], has = o && o.value; label.textContent = has ? o.textContent : placeholder; btn.classList.toggle("ph", !has); };
+    const paint = () => list.querySelectorAll("li[data-i]").forEach(li => li.classList.toggle("act", +li.dataset.i === act));
+    const render = () => {
+      const t = q.value.trim().toLowerCase();
+      shown = opts.filter(o => o.textContent.toLowerCase().includes(t)); act = 0;
+      list.innerHTML = shown.length
+        ? shown.map((o, i) => `<li role="option" data-i="${i}" class="${o.value === sel.value ? "sel" : ""}${i === 0 ? " act" : ""}">${esc(o.textContent)}</li>`).join("")
+        : `<li class="none">No match found</li>`;
+    };
+    const close = () => { panel.classList.add("hidden"); btn.setAttribute("aria-expanded", "false"); };
+    const open = () => {
+      document.querySelectorAll(".ss-panel:not(.hidden)").forEach(p => p.classList.add("hidden"));
+      q.value = ""; render(); panel.classList.remove("hidden"); btn.setAttribute("aria-expanded", "true");
+      panel.scrollIntoView({ block: "nearest" }); q.focus({ preventScroll: true });
+    };
+    const pick = o => { if (!o) return; sel.value = o.value; sel.dispatchEvent(new Event("change", { bubbles: true })); sync(); close(); btn.focus(); };
+    btn.onclick = () => panel.classList.contains("hidden") ? open() : close();
+    q.oninput = render;
+    q.onkeydown = e => {
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault(); if (!shown.length) return;
+        act = (act + (e.key === "ArrowDown" ? 1 : -1) + shown.length) % shown.length; paint();
+        list.children[act].scrollIntoView({ block: "nearest" });
+      } else if (e.key === "Enter") { e.preventDefault(); pick(shown[act]); }
+      else if (e.key === "Escape") { close(); btn.focus(); }
+    };
+    list.onclick = e => { const li = e.target.closest("li[data-i]"); if (li) pick(shown[+li.dataset.i]); };
+    document.addEventListener("click", e => { if (!wrap.contains(e.target)) close(); });
+    const lab = document.querySelector(`label[for="${sel.id}"]`); if (lab) lab.onclick = e => { e.preventDefault(); btn.focus(); };
+    sel._sync = sync; sync();
+  }
+  ["vendor_name", "part_name", "serial_no", "joint_details", "quantity"].forEach(id => makeSearchable($(id)));
 
   /* ---------- Generate form ---------- */
   const defBase = location.href.split("?")[0].split("#")[0].replace(/index\.html$/, "");
@@ -402,7 +504,7 @@ fields: fields
   $("a-pdf").onclick = () => lastRec && savePDF(lastRec);
   $("a-print").onclick = () => window.print();
   $("a-new").onclick = () => {
-    ["vendor_name", "part_name", "joint details","serialNo","quantity"].forEach(i => $(i).value = "");
+    ["vendor_name", "part_name", "serial_no", "joint_details", "quantity"].forEach(i => { $(i).value = ""; $(i)._sync && $(i)._sync(); });
     $("cf-box").innerHTML = ""; cfN = 0; lastRec = null;
     $("preview").textContent = "Fill details to generate preview"; $("acts").classList.add("hidden");
   };
@@ -412,9 +514,9 @@ fields: fields
     const q = $("search").value.trim().toLowerCase();
     const rows = records.filter(r => !q || [r.barcodeId, r.vendorName, r.partName].some(v => String(v).toLowerCase().includes(q)));
     $("rec-body").innerHTML = rows.length ? rows.map(r => `<tr>
-      <td><strong>${esc(r.barcodeId)}</strong></td><td>${esc(r.vendorName)}</td><td>${esc(r.vendorId)}</td><td>${esc(r.partName)}</td>
-      <td>${esc(r.jointId)}</td><td>${esc(r.serial)}</td><td>${r.createdAt ? new Date(r.createdAt).toLocaleString() : ""}</td>
-      <td><button class="btn btn-o btn-s" data-a="png" data-id="${esc(r.barcodeId)}">PNG</button>
+      <td data-label="Part ID"><strong>${esc(r.barcodeId)}</strong></td><td data-label="Vendor">${esc(r.vendorName)}</td><td data-label="Vendor ID">${esc(r.vendorId)}</td><td data-label="Part Name">${esc(r.partName)}</td>
+      <td data-label="Joint ID">${esc(r.jointId)}</td><td data-label="Serial">${esc(r.serial)}</td><td data-label="Registered">${r.createdAt ? new Date(r.createdAt).toLocaleString() : ""}</td>
+      <td class="act"><button class="btn btn-o btn-s" data-a="png" data-id="${esc(r.barcodeId)}">PNG</button>
           <button class="btn btn-o btn-s" data-a="pdf" data-id="${esc(r.barcodeId)}">PDF</button>
           <a class="btn btn-o btn-s" href="${esc(r.url)}" target="_blank" rel="noopener">Open</a>
           <button class="btn btn-o btn-s btn-d" data-a="del" data-id="${esc(r.barcodeId)}">Delete</button></td></tr>`).join("")
